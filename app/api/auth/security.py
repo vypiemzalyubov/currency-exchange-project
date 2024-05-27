@@ -5,30 +5,35 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
+from pydantic import EmailStr
 
 from app.core.config import settings
+from app.dao.dao_register_user import AuthUserDAO
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='auth/login')
 
 
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
-    to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.now(datetime.UTC)() + expires_delta
-    else:
-        expire = datetime.now(datetime.UTC) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode.update({'exp': expire})
-    encoded_jwt = jwt.encode(to_encode, settings.JWT_SECRET, algorithm=settings.ALGORITHM)
-    return encoded_jwt
+def get_password_hash(password: str) -> str:
+    return pwd_context.hash(password)
 
 
-def verify_password(plain_password, hashed_password):
+def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 
-def get_password_hash(password):
-    return pwd_context.hash(password)
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
+    to_encode = data.copy()
+    expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    if expires_delta:
+        expire = expire + expires_delta
+    to_encode.update({'exp': expire})
+    encoded_jwt = jwt.encode(
+        to_encode,
+        settings.JWT_SECRET,
+        algorithm=settings.ALGORITHM
+    )
+    return encoded_jwt
 
 
 def decode_access_token(token: str):
@@ -40,6 +45,13 @@ def decode_access_token(token: str):
         return username
     except JWTError:
         raise credentials_exception
+
+
+async def authenticate_user(email: EmailStr, password: str):
+    user = await AuthUserDAO.find_one_or_none(email=email)
+    if not user and not verify_password(plain_password=password, hashed_password=user.password):
+        return None
+    return user
 
 
 credentials_exception = HTTPException(

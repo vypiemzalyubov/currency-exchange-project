@@ -1,13 +1,13 @@
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 
 class Users(BaseModel):
     user_id: int
     username: str
+    email: EmailStr
     hashed_password: str
-    favorite_coin: str
     created_date: datetime
 
     class Config:

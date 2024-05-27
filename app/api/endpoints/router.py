@@ -1,7 +1,7 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 
 from app.api.schemas.schemas import Users
-from app.dao_users import UsersDAO
+from app.dao.dao_users import UsersDAO
 
 router = APIRouter(
     prefix='/currency',
@@ -10,9 +10,7 @@ router = APIRouter(
 
 
 @router.get('')
-async def get_users() -> list[Users]:
-    return await UsersDAO.get_all_users()
-
-# @router.get('')
-# async def get_user() -> Users:# -> Any:
-#     return await UsersDAO.get_user_by_id()
+async def get_users(request: Request): #-> list[Users]:
+    print(request.cookies)
+    print(request.client)
+    print(request.url)

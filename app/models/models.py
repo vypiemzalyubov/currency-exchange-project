@@ -12,8 +12,8 @@ class Users(Base):
 
     user_id: Mapped[int] = mapped_column(BigInteger, primary_key=True, index=True, autoincrement=True)
     username: Mapped[str]
+    email: Mapped[str]
     hashed_password: Mapped[str]
-    favorite_coin: Mapped[str]
     created_date: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )

@@ -1,3 +1,5 @@
+import os
+
 from dotenv import find_dotenv, load_dotenv
 from pydantic_settings import BaseSettings
 
@@ -5,6 +7,11 @@ load_dotenv(find_dotenv('.env'))
 
 
 class Settings(BaseSettings):
+    # API_KEY: str = os.getenv('API_KEY')
+    ALGORITHM: str
+    ACCESS_TOKEN_EXPIRE_MINUTES: int
+    JWT_SECRET: str
+
     DB_HOST: str
     DB_PORT: int
     DB_USER: str
