@@ -1,15 +1,15 @@
 from datetime import datetime
 
-from fastapi import Depends, HTTPException, Request, status
+from fastapi import Depends, Request
 from jose import JWTError, jwt
 
 from app.core.config import settings
 from app.dao.dao_users import UsersDAO
 from app.exceptions import (
     ExpiredTokenException,
-    IncorrectEmailOrPasswordException,
     IncorrectTokenFormatException,
     TokenAbsentException,
+    UserNotPresentException,
 )
 
 
@@ -30,8 +30,8 @@ async def get_current_user(token: str = Depends(get_token)):
         raise ExpiredTokenException
     user_id: str = payload.get('sub')
     if not user_id:
-        raise IncorrectEmailOrPasswordException
+        raise UserNotPresentException
     user = await UsersDAO.get_user_by_id(int(user_id))
     if not user:
-        raise IncorrectEmailOrPasswordException
+        raise UserNotPresentException
     return user

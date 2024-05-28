@@ -44,6 +44,6 @@ async def login_user(response: Response, user_data: UserAuth):
 async def logout_user(response: Response):
     response.delete_cookie('currency_exchange_token')
 
-@router.post('/user_info')
+@router.post('/user_info', response_model=Users)
 async def read_user_info(current_user: Users = Depends(get_current_user)):
     return current_user
