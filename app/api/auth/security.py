@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 from typing import Optional
 
-from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
@@ -9,6 +8,7 @@ from pydantic import EmailStr
 
 from app.core.config import settings
 from app.dao.dao_register_user import AuthUserDAO
+from app.exceptions import IncorrectEmailOrPasswordException
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='auth/login')
@@ -31,20 +31,20 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     encoded_jwt = jwt.encode(
         to_encode,
         settings.JWT_SECRET,
-        algorithm=settings.ALGORITHM
+        settings.ALGORITHM
     )
     return encoded_jwt
 
 
-def decode_access_token(token: str):
-    try:
-        payload = jwt.decode(token, settings.JWT_SECRET, algorithms=[settings.ALGORITHM])
-        username: str = payload.get('sub')
-        if username is None:
-            raise credentials_exception
-        return username
-    except JWTError:
-        raise credentials_exception
+# def decode_access_token(token: str):
+#     try:
+#         payload = jwt.decode(token, settings.JWT_SECRET, settings.ALGORITHM)
+#         username: str = payload.get('sub')
+#         if username is None:
+#             raise IncorrectEmailOrPasswordException
+#         return username
+#     except JWTError:
+#         raise IncorrectEmailOrPasswordException
 
 
 async def authenticate_user(email: EmailStr, password: str):
@@ -52,10 +52,3 @@ async def authenticate_user(email: EmailStr, password: str):
     if not user and not verify_password(plain_password=password, hashed_password=user.password):
         return None
     return user
-
-
-credentials_exception = HTTPException(
-    status_code=status.HTTP_401_UNAUTHORIZED,
-    detail='Could not validate credentials',
-    headers={'WWW-Authenticate': 'Bearer'},
-)

@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Depends, Request
 
+from app.api.auth.dependencies import get_current_user
 from app.api.schemas.schemas import Users
 from app.dao.dao_users import UsersDAO
 
@@ -10,7 +11,6 @@ router = APIRouter(
 
 
 @router.get('')
-async def get_users(request: Request): #-> list[Users]:
-    print(request.cookies)
-    print(request.client)
-    print(request.url)
+async def get_users(user: Users = Depends(get_current_user)): #-> list[Users]:
+    return user
+    # return await UsersDAO.get_all_users()
