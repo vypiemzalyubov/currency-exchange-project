@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, Response
 
 from app.api.auth.dependencies import get_current_user
 from app.api.auth.schemas import UserAuth, UserRegister
@@ -7,14 +7,11 @@ from app.api.auth.security import (
     create_access_token,
     get_password_hash,
 )
-from app.api.schemas.schemas import Users
+from app.api.schemas.users import Users
 from app.dao.dao_register_user import AuthUserDAO
 from app.exceptions import IncorrectEmailOrPasswordException, UserAlreadyExistsException
 
-router = APIRouter(
-    prefix='/auth',
-    tags=['Auth User']
-)
+router = APIRouter(prefix='/auth', tags=['Auth User'])
 
 
 @router.post('/register')
@@ -23,11 +20,7 @@ async def register_user(user_data: UserRegister):
     if existing_user:
         raise UserAlreadyExistsException
     hashed_password = get_password_hash(user_data.password)
-    await AuthUserDAO.add_user(
-        username=user_data.username,
-        email=user_data.email,
-        hashed_password=hashed_password
-    )
+    await AuthUserDAO.add_user(username=user_data.username, email=user_data.email, hashed_password=hashed_password)
 
 
 @router.post('/login')
@@ -43,6 +36,7 @@ async def login_user(response: Response, user_data: UserAuth):
 @router.post('/logout')
 async def logout_user(response: Response):
     response.delete_cookie('currency_exchange_token')
+
 
 @router.post('/user_info', response_model=Users)
 async def read_user_info(current_user: Users = Depends(get_current_user)):
