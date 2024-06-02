@@ -1,8 +1,9 @@
+alembic
+asyncpg
 fastapi[all]
 python-jose[cryptography]
 passlib[bcrypt]
-requests
 python-dotenv
+requests
 sqlalchemy
-asyncpg
-alembic
+sqladmin

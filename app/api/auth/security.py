@@ -2,13 +2,12 @@ from datetime import datetime, timedelta
 from typing import Optional
 
 from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError, jwt
+from jose import jwt
 from passlib.context import CryptContext
 from pydantic import EmailStr
 
 from app.core.config import settings
 from app.dao.dao_register_user import AuthUserDAO
-from app.exceptions import IncorrectEmailOrPasswordException
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='auth/login')
@@ -34,17 +33,6 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
         settings.ALGORITHM
     )
     return encoded_jwt
-
-
-# def decode_access_token(token: str):
-#     try:
-#         payload = jwt.decode(token, settings.JWT_SECRET, settings.ALGORITHM)
-#         username: str = payload.get('sub')
-#         if username is None:
-#             raise IncorrectEmailOrPasswordException
-#         return username
-#     except JWTError:
-#         raise IncorrectEmailOrPasswordException
 
 
 async def authenticate_user(email: EmailStr, password: str):
