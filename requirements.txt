@@ -7,6 +7,7 @@ passlib[bcrypt]
 pytest
 pytest-asyncio
 python-dotenv
+python-json-logger
 sqlalchemy
 sqladmin
 

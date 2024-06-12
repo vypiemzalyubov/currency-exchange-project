@@ -8,6 +8,7 @@ load_dotenv(find_dotenv('.env'))
 
 class Settings(BaseSettings):
     MODE: Literal['PROD', 'TEST']
+    LOG_LEVEL: str
 
     # API_KEY: str = os.getenv('API_KEY')
     ALGORITHM: str

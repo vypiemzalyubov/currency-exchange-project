@@ -1,4 +1,6 @@
-from fastapi import FastAPI
+import time
+
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from sqladmin import Admin
@@ -9,6 +11,7 @@ from app.api.auth.router import router as user_router
 from app.api.endpoints.router import router as currency_router
 from app.database import engine
 from app.images.router import router as images_router
+from app.logger import logger
 from app.pages.router import router as pages_router
 
 app = FastAPI()
@@ -34,5 +37,13 @@ admin = Admin(app, engine, authentication_backend=authentication_backend)
 
 admin.add_view(UsersAdmin)
 
-# if __name__ == '__main__':
-#     uvicorn.run('main:app', host='127.0.0.1', port=8000, reload=True)
+
+@app.middleware('http')
+async def add_process_time_header(request: Request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    process_time = time.time() - start_time
+    logger.info('Request handling time', extra={'process_time': round(process_time, 4)})
+    response.headers['X-Process-Time'] = str(process_time)
+    return response
+    
