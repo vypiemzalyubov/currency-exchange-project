@@ -7,6 +7,9 @@ router = APIRouter(prefix='/pages', tags=['Frontend'])
 
 templates = Jinja2Templates(directory='app/templates')
 
+
 @router.get('/users')
 async def get_users_page(request: Request, users=Depends(get_users)):
-    return templates.TemplateResponse(name='users.html', context={'request': request, 'users': users})
+    return templates.TemplateResponse(
+        name='users.html', context={'request': request, 'users': users}
+    )

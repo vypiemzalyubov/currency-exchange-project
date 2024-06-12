@@ -10,7 +10,9 @@ from app.database import Base
 class Users(Base):
     __tablename__ = 'users'
 
-    user_id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(
+        Integer, primary_key=True, index=True, autoincrement=True
+    )
     username: Mapped[str]
     email: Mapped[str]
     hashed_password: Mapped[str]

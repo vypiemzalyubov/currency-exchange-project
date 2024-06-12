@@ -27,11 +27,11 @@ class AdminAuth(AuthenticationBackend):
 
         if not token:
             return RedirectResponse(request.url_for('admin:login'), status_code=302)
-        
+
         user = await get_current_user(token)
         if not user:
             return RedirectResponse(request.url_for('admin:login'), status_code=302)
-        
+
         return True
 
 

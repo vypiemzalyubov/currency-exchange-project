@@ -27,16 +27,14 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     if expires_delta:
         expire = expire + expires_delta
     to_encode.update({'exp': expire})
-    encoded_jwt = jwt.encode(
-        to_encode,
-        settings.JWT_SECRET,
-        settings.ALGORITHM
-    )
+    encoded_jwt = jwt.encode(to_encode, settings.JWT_SECRET, settings.ALGORITHM)
     return encoded_jwt
 
 
 async def authenticate_user(email: EmailStr, password: str):
     user = await AuthUserDAO.find_one_or_none(email=email)
-    if not user and not verify_password(plain_password=password, hashed_password=user.password):
+    if not user and not verify_password(
+        plain_password=password, hashed_password=user.password
+    ):
         return None
     return user
