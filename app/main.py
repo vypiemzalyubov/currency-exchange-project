@@ -3,6 +3,7 @@ import time
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from prometheus_fastapi_instrumentator import Instrumentator
 from sqladmin import Admin
 
 from app.api.admin.auth import authentication_backend
@@ -33,8 +34,13 @@ app.add_middleware(
     allow_headers=['*'],
 )
 
-admin = Admin(app, engine, authentication_backend=authentication_backend)
+instrumentator = Instrumentator(
+    should_group_status_codes=False,
+    excluded_handlers=['.*admin.*', '/metrics'],
+)
+instrumentator.instrument(app).expose(app)
 
+admin = Admin(app, engine, authentication_backend=authentication_backend)
 admin.add_view(UsersAdmin)
 
 
@@ -46,4 +52,3 @@ async def add_process_time_header(request: Request, call_next):
     logger.info('Request handling time', extra={'process_time': round(process_time, 4)})
     response.headers['X-Process-Time'] = str(process_time)
     return response
-    
