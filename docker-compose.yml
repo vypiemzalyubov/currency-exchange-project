@@ -14,43 +14,14 @@ services:
     image: currency_app
     build:
       context: .
-    container_name: booking_app
+    container_name: currency_app
     env_file:
       - .env-prod
     depends_on:
       - db
     command: ["/currency/docker/app.sh"]
-    # command: sh -c "alembic upgrade head && gunicorn app.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind=0.0.0.0:8000"
     ports:
       - 7777:8000
-
-  # celery:
-  #   image: booking_celery
-  #   build:
-  #     context: . # celery это библиотека, у неё нет образа, берём из основного билда
-  #   container_name: booking_celery
-  #   # Если не работает эта команда, используйте закомментированную
-  #   command: ["/booking/docker/celery.sh", "celery"] # Второй аргумен для if/elif в скрипте
-  #   # command: sh -c "celery --app=app.tasks.celery:celery worker -l INFO"
-  #   env_file:
-  #     - .env-non-dev
-  #   depends_on:
-  #     - redis
-
-  # flower:
-  #   image: booking_flower
-  #   build:
-  #     context: . # flower это библиотека, у неё нет образа, берём из основного билда
-  #   container_name: booking_flower
-  #   # Если не работает эта команда, используйте закомментированную
-  #   command: ["/booking/docker/celery.sh", "flower"]
-  #   # command: sh -c "celery --app=app.tasks.celery:celery flower"
-  #   env_file:
-  #     - .env-non-dev
-  #   depends_on:
-  #     - redis
-  #   ports:
-  #     - 5555:5555
 
   # prometheus:
   #   image: prom/prometheus:v2.43.0
